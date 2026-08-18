@@ -27,7 +27,7 @@ it is **not** a service, not a vector store, not a managed memory provider. it's
 
 ## the world
 
-wokoyo (我が世) is the world the agents inhabit together. captures are born, they either mature into something worth keeping or expire and fade, and the curated ones get promoted back to the durable read layer. nothing sits in an "everything I've ever said" bucket.
+wakoyo is the world the agents inhabit together. captures are born, they either mature into something worth keeping or expire and fade, and the curated ones get promoted back to the durable read layer. nothing sits in an "everything I've ever said" bucket.
 
 the memory model has two layers:
 
