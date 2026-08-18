@@ -1,4 +1,4 @@
-# wakayo (我が世)
+# wakayo
 
 **Local memory store for AI agents — one world, two editors.**
 
