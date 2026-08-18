@@ -16,10 +16,14 @@ memory.db
 launchd/
 crontab.local
 *.plist
+# (repo docs: examples/lifecycle.plist is committed)
 
 # editor-local
 .opencode/
 .cursor/
+
+# Python build artifacts (pip install -e . creates these)
+src/*.egg-info/
 
 # OS
 .DS_Store
