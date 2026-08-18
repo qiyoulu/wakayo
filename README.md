@@ -19,54 +19,65 @@ wakayo export [--path FILE]    # dump all entries to markdown
 
 ---
 
-## what it is
+## What it is
 
-wakayo is a **local, file-backed SQLite store** with full-text search and a lifecycle that decides what lives, what fades, and what gets curated. it's the memory layer a set of AI agents share — Hermes and opencode are two interfaces to the same brain.
+wakayo is a **local, file-backed SQLite store** with full-text search and a lifecycle that decides what lives, what fades, and what gets curated. It's the memory layer a set of AI agents share — Hermes and opencode are two interfaces to the same brain.
 
-it is **not** a service, not a vector store, not a managed memory provider. it's a file, a CLI, and a lifecycle tick. no Ollama, no Qdrant, no embeddings, no external dependency. inspectable with `sqlite3`, backs up with everything else.
+It is **not** a service, not a vector store, not a managed memory provider. It's a file, a CLI, and a lifecycle tick. No Ollama, no Qdrant, no embeddings, no external dependency. Inspectable with `sqlite3`, backs up with everything else.
 
-## the world
+## The world
 
 wakayo is the world the agents inhabit together. captures are born, they either mature into something worth keeping or expire and fade, and the curated ones get promoted back to the durable read layer. nothing sits in an "everything I've ever said" bucket.
 
-the memory model has two layers:
+The memory model has two layers:
 
-- **runtime memory** — the SQLite store. episodic captures, source-tagged, with optional TTL. this is what the CLI reads and writes. this is what opencode and Hermes share.
-- **durable on-demand read layer** — `~/MEMORY.md` and the all-caps config files (`USER.md`, `AGENTS.md`, `SOUL.md`, etc.). standing identity, rules, and curated state. read on demand, not in every context. the store promotes curated entries back here.
+- **Runtime memory** — the SQLite store. Episodic captures, source-tagged, with optional TTL. This is what the CLI reads and writes. This is what opencode and Hermes share.
+- **Durable on-demand read layer** — `~/MEMORY.md` and the all-caps config files (`USER.md`, `AGENTS.md`, `SOUL.md`, etc.). Standing identity, rules, and curated state. Read on demand, not in every context. The store promotes curated entries back here.
 
-the two layers are separate by design. the store is for runtime memory; the files are for standing state. you don't merge them.
+The two layers are separate by design. The store is for runtime memory; the files are for standing state. You don't merge them.
 
-## lifecycle
+## Lifecycle
 
-lifecycle is a **separate local tick** (launchd or cron) — not part of the pip package, because it's a machine-local concern. the pattern:
+Lifecycle is a **separate local tick** (launchd or cron) — not part of the pip package, because it's a machine-local concern. The pattern:
 
-1. **expire** — `wakayo compact` deletes entries past their `expires_at`.
-2. **compact** — optionally dedupe near-duplicates (future).
-3. **promote** — curated entries get promoted to `~/MEMORY.md` via `wakayo promote <id>`.
+1. **Expire** — `wakayo compact` deletes entries past their `expires_at`.
+2. **Compact** — optionally dedupe near-duplicates (future).
+3. **Promote** — curated entries get promoted to `~/MEMORY.md` via `wakayo promote <id>`.
 
-a launchd `StartCalendarInterval` tick once a day runs the sweep. the tick is machine-local; the repo documents the pattern.
+A launchd `StartCalendarInterval` tick once a day runs the sweep. The tick is machine-local; the repo documents the pattern.
 
-## query
+## Query
 
-FTS5 over the content. filters by source, tags, date range, limit. results are readable by default, JSON with `--json`. no embeddings, no semantic search — just text search over what was actually stored. if you want semantic later, that's an adapter on top, not a change to the store.
+FTS5 over the content. Filters by source, tags, date range, limit. Results are readable by default, JSON with `--json`. No embeddings, no semantic search — just text search over what was actually stored. If you want semantic later, that's an adapter on top, not a change to the store.
 
-## editor integration
+## Editor integration
 
-the CLI is the shared interface. both editors call the same thing.
+The CLI is the shared interface. Both editors call the same thing.
 
 - **opencode** — bash out to `wakayo add/query/...` or wrap the CLI as a tiny MCP server (you already load MCP servers — playwright is in your `opencode.json`).
 - **Hermes** — call the CLI via the terminal tool, or wrap it as a `memory.provider` plugin under `plugins/memory/` for native integration.
 
-the CLI is editor-agnostic. the wrappers are thin.
+The CLI is editor-agnostic. The wrappers are thin.
 
-## storage
+## Storage
 
-defaults to `~/.local/share/wakayo/memory.db` (XDG, portable; overridable via `WAKAYO_DIR`). SQLite + WAL. FTS5 virtual table over content. metadata columns: `source`, `tags`, `created_at`, `expires_at`, `promoted`. atomic writes via transactions; FTS5 stays in sync via triggers.
+Defaults to `~/.local/share/wakayo/memory.db` (XDG, portable; overridable via `WAKAYO_DIR`). SQLite + WAL. FTS5 virtual table over content. Metadata columns: `source`, `tags`, `created_at`, `expires_at`, `promoted`. Atomic writes via transactions; FTS5 stays in sync via triggers.
 
-## license
+## License
 
 MIT.
 
-## status
+## Status
 
-seed / MVP. schema + CLI + lifecycle pattern are real; the Hermes `memory.provider` wrapper and opencode MCP wrapper are documented as examples first, deeper integration second.
+Seed / MVP. Schema + CLI + lifecycle pattern are real; the Hermes `memory.provider` wrapper and opencode MCP wrapper are documented as examples first, deeper integration second.
+
+## Name
+
+**wakayo** (我が世) comes from the *Iroha uta* (いろは歌), the classic Japanese pangram poem that arranges all kana in a single quatrain:
+
+> いろはにほへとちりぬるを
+> わかよたれそつねんころり
+> うゐのおくやまさきすゑむ
+> あせたちりぬるを
+
+*わかよ* (*wakayo*) is the 8th–11th syllables of the second line: 我が世, "our world." It was chosen as the project name because this is the shared world both editors — Hermes and opencode — inhabit together.
