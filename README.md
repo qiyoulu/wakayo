@@ -81,3 +81,5 @@ Seed / MVP. Schema + CLI + lifecycle pattern are real; the Hermes `memory.provid
 > あせたちりぬるを
 
 *わかよ* (*wakayo*) is the 8th–11th syllables of the second line: 我が世, "our world." It was chosen as the project name because this is the shared world both editors — Hermes and opencode — inhabit together.
+
+There is a second reading: 若代 (*wakayo*, "young generation") — the generational hypothesis made literal, paralleling the Iroha reading. The store is the young generation (short-lived, swept by `wakayo compact`); the standing files (`~/MEMORY.md`, `USER.md`, `AGENTS.md`, `SOUL.md`) are the tenured space, promoted into via `wakayo_promote`. Most captures are ephemeral and should be collected fast; only the durable fraction is promoted. The mark-and-sweep pattern is the same one a generational garbage collector uses: mark the session as learned after the pipeline runs, then free the buffer.
