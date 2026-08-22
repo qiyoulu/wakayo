@@ -21,13 +21,13 @@ wakayo export [--path FILE]    # dump all entries to markdown
 
 ## What it is
 
-wakayo is a **local, file-backed SQLite store** with full-text search and a lifecycle that decides what lives, what fades, and what gets curated. It's the memory layer a set of AI agents share — Hermes and opencode are two interfaces to the same brain.
+Wakayo is a **local, file-backed SQLite store** with full-text search and a lifecycle that decides what lives, what fades, and what gets curated. It's the memory layer a set of AI agents share — Hermes and opencode are two interfaces to the same brain.
 
 It is **not** a service, not a vector store, not a managed memory provider. It's a file, a CLI, and a lifecycle tick. No Ollama, no Qdrant, no embeddings, no external dependency. Inspectable with `sqlite3`, backs up with everything else.
 
 ## The world
 
-wakayo is the world the agents inhabit together. captures are born, they either mature into something worth keeping or expire and fade, and the curated ones get promoted back to the durable read layer. nothing sits in an "everything I've ever said" bucket.
+Wakayo is the world the agents inhabit together. captures are born, they either mature into something worth keeping or expire and fade, and the curated ones get promoted back to the durable read layer. nothing sits in an "everything I've ever said" bucket.
 
 The memory model has two layers:
 

@@ -62,18 +62,22 @@ def init_db(conn: sqlite3.Connection) -> None:
         CREATE VIRTUAL TABLE IF NOT EXISTS episodic_fts USING fts5(content);
 
         CREATE TRIGGER IF NOT EXISTS episodic_ai AFTER INSERT ON episodic BEGIN
-            INSERT INTO episodic_fts(rowid, content) VALUES (new.id, new.content);
+            INSERT INTO episodic_fts(episodic_fts, rowid, content)
+            VALUES ('insert', new.id, new.content);
         END;
 
         CREATE TRIGGER IF NOT EXISTS episodic_ad AFTER DELETE ON episodic BEGIN
-            DELETE FROM episodic_fts WHERE rowid = old.id;
+            INSERT INTO episodic_fts(episodic_fts, rowid)
+            VALUES ('delete', old.id);
         END;
 
         CREATE TRIGGER IF NOT EXISTS episodic_au AFTER UPDATE ON episodic
             WHEN old.content != new.content
         BEGIN
-            DELETE FROM episodic_fts WHERE rowid = old.id;
-            INSERT INTO episodic_fts(rowid, content) VALUES (new.id, new.content);
+            INSERT INTO episodic_fts(episodic_fts, rowid)
+            VALUES ('delete', old.id);
+            INSERT INTO episodic_fts(episodic_fts, rowid, content)
+            VALUES ('insert', new.id, new.content);
         END;
         """
     )

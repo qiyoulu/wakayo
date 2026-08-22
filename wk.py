@@ -11,16 +11,36 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# locate the wakayo CLI
+# locate the wakayo CLI — discoverable via PATH, not hardcoded to a venv
 # ---------------------------------------------------------------------------
-WAKAYO_CLI = os.environ.get("WAKAYO_CLI") or str(
-    Path.home() / ".hermes" / "hermes-agent" / "venv" / "bin" / "wakayo"
-)
+def _discover_wakayo_cli() -> str | None:
+    """Find wakayo on PATH first; fall back to the Hermes venv for the
+    current shared-install layout.  Set WAKAYO_CLI to override either."""
+    on_path = shutil.which("wakayo")
+    if on_path:
+        return on_path
+    # legacy fallback: the shared pip install in the Hermes venv.
+    # this path is NOT the default any more — only used when wakayo isn't
+    # on PATH and the shared install is still present.
+    legacy = Path.home() / ".hermes" / "hermes-agent" / "venv" / "bin" / "wakayo"
+    if legacy.is_file():
+        return str(legacy)
+    return None
+
+
+_WAKAYO_CLI = os.environ.get("WAKAYO_CLI") or _discover_wakayo_cli()
+if _WAKAYO_CLI is None:
+    sys.exit(
+        "error: wakayo CLI not found. install wakayo (pip install wakayo) or "
+        "set WAKAYO_CLI to the binary path."
+    )
+WAKAYO_CLI = _WAKAYO_CLI
 WAKAYO_DIR = os.environ.get("WAKAYO_DIR") or str(Path.home() / ".local" / "share" / "wakayo")
 
 
@@ -174,9 +194,10 @@ TOOLS: dict[str, dict] = {
     "wakayo_promote": {
         "name": "wakayo_promote",
         "description": (
-            "Promote an entry to ~/MEMORY.md — the curated durable layer. "
-            "Use for entries worth keeping long-term; the lifecycle tick also "
-            "promotes aged entries automatically."
+            "Promote an entry to the standing layer: set the DB-only "
+            "promoted=1 flag so it survives compaction. This does NOT write "
+            "to ~/MEMORY.md — ~/MEMORY.md is a separate curated file kept by "
+            "hand. Promote is a queryability/audit flag, not a file-write path."
         ),
         "inputSchema": {
             "type": "object",
