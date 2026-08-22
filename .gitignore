@@ -23,6 +23,7 @@ crontab.local
 .cursor/
 
 # Python build artifacts (pip install -e . creates these)
+build/
 src/*.egg-info/
 
 # OS
