@@ -50,6 +50,18 @@ A launchd `StartCalendarInterval` tick once a day runs the sweep. The tick is ma
 
 FTS5 over the content. Filters by source, tags, date range, limit. Results are readable by default, JSON with `--json`. No embeddings, no semantic search — just text search over what was actually stored. If you want semantic later, that's an adapter on top, not a change to the store.
 
+**FTS5 query syntax** (`wakayo query "..."`):
+
+| syntax                        | meaning                                                   | example                              |
+| ----------------------------- | --------------------------------------------------------- | ------------------------------------ |
+| `word1 word2`                 | implicit AND on tokens                                    | `"memory db"` → both must appear     |
+| `"exact phrase"`              | phrase match (token order preserved)                      | `"set up"` matches that, not "up set" |
+| `word1 OR word2`              | either token                                              | `"alpha OR beta OR gamma"`           |
+| `token*`                      | prefix wildcard                                           | `"deploy*"` matches "deploying" etc. |
+| `python NOT java`             | boolean negation                                          | `"python NOT java"`                  |
+
+a query that returns nothing usually means two things: either the tokens don't co-occur in any row, or the FTS5 index needs a `wakayo compact` to clean up.
+
 ## Editor integration
 
 The CLI is the shared interface. Both editors call the same thing.
