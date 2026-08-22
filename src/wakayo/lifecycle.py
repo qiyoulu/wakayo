@@ -12,7 +12,10 @@ Pattern (daily):
 from __future__ import annotations
 
 import sqlite3
+import time
 from pathlib import Path
+from typing import Optional
+
 from wakayo.store import db_path, connect, init_db, compact as store_compact
 
 
@@ -42,8 +45,6 @@ def sweep_promote_candidate(
     MVP: entries old enough and not yet promoted. Importance scoring and
     the promotion gate are future work — for now it's age + not-yet-promoted.
     """
-    import time
-
     cutoff = time.time() - min_age_days * 86400.0
     rows = conn.execute(
         """

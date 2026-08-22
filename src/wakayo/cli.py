@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 import os
 from datetime import datetime, timezone
@@ -49,7 +50,7 @@ def _print_json(results: list[dict]) -> None:
     print(json.dumps(results, indent=2, default=str))
 
 
-def get_conn(args: argparse.Namespace) -> __import__("sqlite3").Connection:
+def get_conn(args: argparse.Namespace) -> sqlite3.Connection:
     path = db_path(_env_dir())
     conn = connect(path)
     init_db(conn)

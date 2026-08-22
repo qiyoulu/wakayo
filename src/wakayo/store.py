@@ -14,6 +14,7 @@ match "_startup"). A proper tags table is future work.
 
 from __future__ import annotations
 
+import datetime
 import sqlite3
 import time
 from pathlib import Path
@@ -283,7 +284,6 @@ def export_markdown(conn: sqlite3.Connection, path: Optional[Path] = None) -> st
         lines.append(f"## id={r['id']}  ({r['source']})")
         if r["tags"]:
             lines.append(f"tags: {r['tags']}")
-        import datetime
 
         ts = datetime.datetime.fromtimestamp(r["created_at"], tz=datetime.timezone.utc).strftime(
             "%Y-%m-%d %H:%M UTC"
