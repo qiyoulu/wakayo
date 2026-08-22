@@ -150,10 +150,9 @@ def cmd_get(args: argparse.Namespace) -> None:
 
 
 def cmd_promote(args: argparse.Namespace) -> None:
-    memory_md = Path(args.memory_md) if args.memory_md else None
     conn = get_conn(args)
     try:
-        entry = promote_entry(conn, args.id, memory_md)
+        entry = promote_entry(conn, args.id)
     finally:
         conn.close()
     print(f"promoted id={entry['id']} (flag set in DB only, no MEMORY.md write)")
@@ -255,9 +254,8 @@ def main() -> None:
     g.set_defaults(func=cmd_get)
 
     # promote
-    pm = sub.add_parser("promote", help="promote an entry to ~/MEMORY.md")
+    pm = sub.add_parser("promote", help="mark an entry as promoted (DB flag only, no MEMORY.md write)")
     pm.add_argument("id", type=int)
-    pm.add_argument("--memory-md", help="path to MEMORY.md (default: ~/MEMORY.md)")
     pm.set_defaults(func=cmd_promote)
 
     # compact

@@ -11,7 +11,7 @@ wakayo add     --content "..." [--source opencode|hermes|manual] [--tags t1,t2] 
 wakayo query   "search text" [--source ...] [--tags ...] [--after 2026-08-17] [--before 2026-08-18] [--limit 20] [--json]
 wakayo list    [--source ...] [--limit 20] [--json]
 wakayo get     <id>
-wakayo promote <id>            # curated entry → ~/MEMORY.md (§-delimited)
+wakayo promote <id>            # mark entry as promoted (DB flag, survives compact)
 wakayo compact                  # expire stale entries
 wakayo stats
 wakayo export [--path FILE]    # dump all entries to markdown
@@ -42,7 +42,7 @@ Lifecycle is a **separate local tick** (launchd or cron) — not part of the pip
 
 1. **Expire** — `wakayo compact` deletes entries past their `expires_at`.
 2. **Compact** — optionally dedupe near-duplicates (future).
-3. **Promote** — curated entries get promoted to `~/MEMORY.md` via `wakayo promote <id>`.
+3. **Promote** — mark entries as promoted via `wakayo promote <id>` (sets the DB flag; does not write to `~/MEMORY.md`).
 
 A launchd `StartCalendarInterval` tick once a day runs the sweep. The tick is machine-local; the repo documents the pattern.
 

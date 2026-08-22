@@ -217,15 +217,14 @@ def get_entry(conn: sqlite3.Connection, entry_id: int) -> Optional[dict[str, Any
 def promote_entry(
     conn: sqlite3.Connection,
     entry_id: int,
-    memory_md_path: Optional[Path] = None,
 ) -> dict[str, Any]:
     """Mark an entry as promoted in the DB only.
 
-    Promotion is now a pure DB flag (promoted=1) — it no longer writes
-    to ~/MEMORY.md.  The old file-append behavior was removed because it
-    let the standing layer grow unbounded.  The lifecycle tick can still
-    use the promoted flag for selection; whichever consumer reads it
-    decides whether to surface the content.
+    Promotion is a pure DB flag (promoted=1) — it does not write to
+    ~/MEMORY.md.  ~/MEMORY.md is a separate curated file kept by hand.
+    The promoted flag is a queryability/audit signal that survives
+    `wakayo compact`; whichever consumer reads it decides whether to
+    surface the content.
     """
     row = get_entry(conn, entry_id)
     if row is None:
@@ -234,40 +233,6 @@ def promote_entry(
     conn.execute("UPDATE episodic SET promoted = 1 WHERE id = ?", (entry_id,))
     conn.commit()
     return row
-
-
-def _promotion_block(row: dict[str, Any]) -> str:
-    source = row.get("source", "manual")
-    tags = row.get("tags", "")
-    created = row.get("created_at", 0)
-    content = row.get("content", "")
-    import datetime
-
-    ts = datetime.datetime.fromtimestamp(created, tz=datetime.timezone.utc).strftime(
-        "%Y-%m-%d %H:%M UTC"
-    )
-    tag_line = f"  from: {source}" + (f" | tags: {tags}" if tags else "")
-    return (
-        f"\n§\n"
-        f"[promoted from wakayo id={row['id']} {ts}]\n"
-        f"{tag_line}\n"
-        f"\n{content}\n"
-        f"§\n"
-    )
-
-
-def _append_atomic(path: Path, block: str) -> None:
-    """Atomically append a block to a file via write to temp + rename.
-
-    The read-then-write pattern has a TOCTTOU race. We write the new
-    full content to a temp file in the same directory and rename over
-    the target — rename is atomic on POSIX.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    new_content = block if not path.exists() else path.read_text() + block
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(new_content)
-    tmp.rename(path)
 
 
 def compact(conn: sqlite3.Connection) -> int:
