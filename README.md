@@ -83,6 +83,8 @@ MIT.
 
 Seed / MVP. Schema + CLI + lifecycle pattern are real; the Hermes `memory.provider` wrapper and opencode MCP wrapper are documented as examples first, deeper integration second.
 
+**Note on transitive dependencies**: The wakayo package itself has no known security vulnerabilities. However, the default installation via `pip install wakayo` into the Hermes agent environment currently pulls `pynacl==1.5.0` as a transitive dependency of `hermes-agent`, which carries CVE-2026-3002 (fixed in pynacl>=1.6.2). If you are using wakayo in a security-sensitive context, either upgrade `hermes-agent` to a version that depends on `pynacl>=1.6.2`, or install wakayo into an isolated environment where you can control the dependency tree.
+
 ## Name
 
 **wakayo** (我が世) comes from the *Iroha uta* (いろは歌), the classic Japanese pangram poem that arranges all kana in a single quatrain:

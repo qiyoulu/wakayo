@@ -15,6 +15,7 @@ match "_startup"). A proper tags table is future work.
 from __future__ import annotations
 
 import datetime
+import os
 import sqlite3
 import time
 from pathlib import Path
@@ -29,6 +30,8 @@ def wakayo_dir(env: Optional[str] = None) -> Path:
     WAKAYO_DIR env var overrides; default is XDG-local
     (~/.local/share/wakayo/). created on demand.
     """
+    if env is None:
+        env = os.environ.get("WAKAYO_DIR")
     base = Path(env) if env else Path.home() / ".local" / "share" / "wakayo"
     base.mkdir(parents=True, exist_ok=True)
     return base
@@ -95,7 +98,7 @@ def add_entry(
     """Insert an episodic entry. Returns the new row id."""
     created_at = now_ts()
     expires_at = None
-    if expires_after_days is not None and expires_after_days > 0:
+    if expires_after_days is not None:
         expires_at = created_at + expires_after_days * 86400.0
 
     tags = tags.strip()
@@ -233,6 +236,7 @@ def promote_entry(
 
     conn.execute("UPDATE episodic SET promoted = 1 WHERE id = ?", (entry_id,))
     conn.commit()
+    row["promoted"] = 1
     return row
 
 
